@@ -1,5 +1,6 @@
 
 from datetime import datetime
+import numpy as np
 
 
 #From https://stackoverflow.com/questions/38066836/python-best-way-to-remove-char-from-string-by-index
@@ -8,7 +9,12 @@ def remove(s, indx):
     return "".join(x for x in s if s.index(x) != indx)
 
 
+#Turns three arrays of points to a 3d array
+def three_arrs_to_threeD(arr_1, arr_2, arr_3):
 
+    arr = np.array([arr_1, arr_2, arr_3]).T
+
+    return arr
 
 
 #Turn an array of strings into an array of numbers

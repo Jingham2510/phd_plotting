@@ -61,11 +61,17 @@ def main(filepath):
     #Calculate the velocities
     vels = xyz_integ_avg(time, pos)
 
-    plt.plot(time, vels[1])
-    plt.show()
+   
+
 
     #Calculate the accelerations
-    accs = []
+    accs = xyz_integ_avg(time, three_arrs_to_threeD(vels[0], vels[1], vels[2]))
+
+  
+    #Create subfigure array for plots
+    #We want to plot force vs pos?
+    #Can decide later
+
 
     return
 
