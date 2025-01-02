@@ -10,12 +10,13 @@ It will plot the position, forces, velocity and acceleration
 """
 
 import matplotlib.pyplot as plt
+from tools import *
+
 
 #Organise the plotting
 def main(filepath):
 
-    times = []
-    curr_time = 0
+    datetimes = []
     pos = []
     forces = []
 
@@ -28,39 +29,78 @@ def main(filepath):
             #Ensure line is empty
             if line:
                 #Split the line up
-                line.split(",")             
+                tokens = data_split(line)         
+                
+                #Append the time data
+                datetimes.append(tokens[0])
 
+                #Append the position data
+                pos.append(tokens[1])
+                
+                #Append the force data
+                forces.append(tokens[2])
+
+
+    #Calculate the time differences 
+    time = calc_time_passed(datetimes)
+
+    #Turn the positions into numbers
+    pos = str_to_array(pos)
+    print(pos)
+
+    #Turn the forces into numbers
+    force = str_to_array(forces)
+
+
+    #Check that the data arrays are the same lengths
+    if(not len(time) == len(pos) == len(forces)):
+        print("DATA ARRAYS ARE INCONSISTENT LENGTH")
+        raise Exception()
     
 
+    #Calculate the velocities
+    vels = xyz_integ_avg(time, pos)
+
+    plt.plot(time, vels[1])
+    plt.show()
+
+    #Calculate the accelerations
+    accs = []
 
     return
 
 
 #Split the line up
+#Not the most efficient but thats okay for now 
 def data_split(line):
 
     tokens = []
 
     #Can remove the line number
-    line.remove(line.find(","))
+    line = line[line.find(",") + 1:]
 
-    
+    #Can remove the date - will always be same length
+    DATE_LENGTH = 11
+    line = line[DATE_LENGTH:]
+
+    #Save the time
+    tokens.append(line[:line.find(",")])
+
+    #Remove the time 
+    line = line[line.find(",") + 1:]
+
+    #Save the positions
+    tokens.append(line[:line.find("]") + 1])
+    #Save the forces
+    tokens.append(line[line.find("]") + 2:line.find("\n")])    
 
     return tokens
-
-
-#Calculate the velocities
-
-
-#Calculate the accelerations
-
-
 
 
 
 
 if __name__ == "__main__":
-    print("gello2)")
+    print("FORCE DISPLACEMENT PLOTTING ------------------")
 
     filepath = "C:/Users/User/Documents/Results/first_pass_test/raw/test.txt"
 
