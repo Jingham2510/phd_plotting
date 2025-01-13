@@ -40,7 +40,6 @@ def str_to_array(arr):
         #Convert to integers
         for y in curr_ind_str:
             for z in y:
-                print(z)
                 curr_ind.append(float(z))
 
     

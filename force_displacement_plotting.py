@@ -46,7 +46,7 @@ def main(filepath):
 
     #Turn the positions into numbers
     pos = str_to_array(pos)
-    print(pos)
+   
 
     #Turn the forces into numbers
     force = str_to_array(forces)
@@ -59,9 +59,7 @@ def main(filepath):
     
 
     #Calculate the velocities
-    vels = xyz_integ_avg(time, pos)
-
-   
+    vels = xyz_integ_avg(time, pos)   
 
 
     #Calculate the accelerations
@@ -72,6 +70,8 @@ def main(filepath):
     #We want to plot force vs pos?
     #Can decide later
 
+    
+    plot_pos_force(pos, force)
 
     return
 
@@ -101,6 +101,24 @@ def data_split(line):
     tokens.append(line[line.find("]") + 2:line.find("\n")])    
 
     return tokens
+
+
+
+#Plot the  x vs y pos vs force
+def plot_pos_force(pos, force):
+
+    #collate the x poses and y poses
+    x_pos = [x[0] for x in pos]
+    y_pos = [x[1] for x in pos]
+
+    #Represent the force as the sum of all of its parts (~worth looking into what alternatives there are)
+    force_mag = [sum(x) for x in force]
+
+
+    plt.plot(x_pos, y_pos)
+
+    plt.show()
+
 
 
 
