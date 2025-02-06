@@ -71,8 +71,8 @@ def main(filepath):
     #Can decide later
 
     
-    plot_pos_force(pos, force)
-
+    #plot_force(force, time)
+    plot_pos(pos, time)
     return
 
 
@@ -105,19 +105,53 @@ def data_split(line):
 
 
 #Plot the  x vs y pos vs force
-def plot_pos_force(pos, force):
-
-    #collate the x poses and y poses
-    x_pos = [x[0] for x in pos]
-    y_pos = [x[1] for x in pos]
-
-    #Represent the force as the sum of all of its parts (~worth looking into what alternatives there are)
-    force_mag = [sum(x) for x in force]
+def plot_force(force, time):
 
 
-    plt.plot(x_pos, y_pos)
+    #Create force array contianing data of each axes
+    forces  = [[],[],[],[],[],[]]
+
+    for i in force:
+        forces[0].append(abs(i[0]))
+        forces[1].append(abs(i[1]))
+        forces[2].append(abs(i[2]))
+        forces[3].append(abs(i[3]))
+        forces[4].append(abs(i[4]))
+        forces[5].append(abs(i[5]))
+
+
+    
+    
+  
+    plt.plot(time, forces[0],  label = "x")
+    plt.plot(time, forces[1],  label = "y")
+    #plt.plot(time, forces[2],  label = "z")
+    #plt.plot(time, forces[3],  label = "rx")
+    #plt.plot(time, forces[4],  label = "ry")
+    #plt.plot(time, forces[5],  label = "rz")
+    plt.legend()
+
+    plt.ylabel("|Force| (N)")
+    plt.xlabel("Time (s)")
 
     plt.show()
+
+
+def plot_pos(pos, time):
+
+    x = [i[0] for i in pos]
+    y = [i[1] for i in pos]
+
+
+    plt.plot(x[10:], y[10:])
+
+    plt.xlabel("x (mm)")
+    plt.ylabel("y (mm)")
+
+    plt.show()
+
+
+    return
 
 
 
@@ -126,6 +160,6 @@ def plot_pos_force(pos, force):
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-    filepath = "C:/Users/User/Documents/Results/first_pass_test/raw/test.txt"
+    filepath = "C:/Users/User/Documents/Results/first_pass_test/raw/first_real_run.txt"
 
     main(filepath)

@@ -39,4 +39,4 @@ def main(filepath):
 
 if __name__ == "__main__":
 
-    main("C:/Users/User/Documents/Results/robot_latency_tests/raw/latency_python.txt")
+    main("C:/Users/User/Documents/Results/robot_latency_tests/raw/latency_cpp.txt")
