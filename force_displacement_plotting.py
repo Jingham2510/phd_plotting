@@ -71,8 +71,8 @@ def main(filepath):
     #Can decide later
 
     
-    #plot_force(force, time)
-    plot_pos(pos, time)
+    plot_force(force, time)
+    #plot_pos(pos, time)
     return
 
 
@@ -111,6 +111,7 @@ def plot_force(force, time):
     #Create force array contianing data of each axes
     forces  = [[],[],[],[],[],[]]
 
+    """
     for i in force:
         forces[0].append(abs(i[0]))
         forces[1].append(abs(i[1]))
@@ -118,21 +119,35 @@ def plot_force(force, time):
         forces[3].append(abs(i[3]))
         forces[4].append(abs(i[4]))
         forces[5].append(abs(i[5]))
+    """
+    for i in force:
+        forces[0].append(i[0])
+        forces[1].append(i[1])
+        forces[2].append(i[2])
+        forces[3].append(i[3])
+        forces[4].append(i[4])
+        forces[5].append(i[5])
 
 
+    fig, ax1 = plt.subplots()
+
+    ax1.set_xlabel("Time (S)")
+    ax1.set_ylabel("|Force| (N)")
+    
+    ax1.plot(time, forces[0],  label = "$F_x$", color="red")
+    ax1.plot(time, forces[1],  label = "$F_y$", color="green")
+    ax1.plot(time, forces[2],  label = "$F_z$", color="blue")
+
+    ax2 = ax1.twinx()
+    ax2.set_ylabel("Moment (N/m)")
+    
+    ax2.plot(time, forces[3],  label = "$M_x$", color="darkorange", linestyle="dashed", linewidth = "0.5")
+    ax2.plot(time, forces[4],  label = "$M_y$", color="navy", linestyle="dashed", linewidth = "0.5")
+    ax2.plot(time, forces[5],  label = "$M_z$", color="cyan", linestyle="dashed", linewidth = "0.5")
     
     
-  
-    plt.plot(time, forces[0],  label = "x")
-    plt.plot(time, forces[1],  label = "y")
-    #plt.plot(time, forces[2],  label = "z")
-    #plt.plot(time, forces[3],  label = "rx")
-    #plt.plot(time, forces[4],  label = "ry")
-    #plt.plot(time, forces[5],  label = "rz")
-    plt.legend()
+    fig.legend()
 
-    plt.ylabel("|Force| (N)")
-    plt.xlabel("Time (s)")
 
     plt.show()
 
