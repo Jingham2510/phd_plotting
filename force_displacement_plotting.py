@@ -71,8 +71,8 @@ def main(filepath):
     #Can decide later
 
     
-    plot_force(force, time)
-    #plot_pos(pos, time)
+    #plot_force(force, time)
+    plot_pos(pos, time)
     return
 
 
@@ -127,23 +127,23 @@ def plot_force(force, time):
         forces[3].append(i[3])
         forces[4].append(i[4])
         forces[5].append(i[5])
-
+    
 
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel("Time (S)")
-    ax1.set_ylabel("|Force| (N)")
+    ax1.set_ylabel("Force (N)")
     
     ax1.plot(time, forces[0],  label = "$F_x$", color="red")
     ax1.plot(time, forces[1],  label = "$F_y$", color="green")
     ax1.plot(time, forces[2],  label = "$F_z$", color="blue")
 
-    ax2 = ax1.twinx()
-    ax2.set_ylabel("Moment (N/m)")
+    #ax2 = ax1.twinx()
+    #ax2.set_ylabel("Moment (N/m)")
     
-    ax2.plot(time, forces[3],  label = "$M_x$", color="darkorange", linestyle="dashed", linewidth = "0.5")
-    ax2.plot(time, forces[4],  label = "$M_y$", color="navy", linestyle="dashed", linewidth = "0.5")
-    ax2.plot(time, forces[5],  label = "$M_z$", color="cyan", linestyle="dashed", linewidth = "0.5")
+    #ax2.plot(time, forces[3],  label = "$M_x$", color="darkorange", linestyle="dashed", linewidth = "0.5")
+    #ax2.plot(time, forces[4],  label = "$M_y$", color="navy", linestyle="dashed", linewidth = "0.5")
+    #ax2.plot(time, forces[5],  label = "$M_z$", color="cyan", linestyle="dashed", linewidth = "0.5")
     
     
     fig.legend()
@@ -175,6 +175,6 @@ def plot_pos(pos, time):
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-    filepath = "C:/Users/User/Documents/Results/first_pass_test/raw/first_real_run.txt"
+    filepath = "C:/Users/User/Documents/Results/tri_poly_test/raw/21_02_tri.txt"
 
     main(filepath)
