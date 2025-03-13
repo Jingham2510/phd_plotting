@@ -37,7 +37,7 @@ def str_to_array(arr):
         curr_ind_str.append(x.split(","))
     
        
-        #Convert to integers
+        #Convert to floats
         for y in curr_ind_str:
             for z in y:
                 curr_ind.append(float(z))

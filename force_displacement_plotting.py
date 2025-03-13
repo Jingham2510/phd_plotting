@@ -21,8 +21,6 @@ def main(filepath):
     ori = []
     forces = []
 
-
-
     #Open the file
     with open(filepath) as file:
         #Go through every line
@@ -30,9 +28,7 @@ def main(filepath):
             #Ensure line is empty
             if line:
                 #Split the line up
-                tokens = data_split(line)       
-                print(tokens)  
-        
+                tokens = data_split(line)               
                 
                 #Append the time data
                 datetimes.append(tokens[0])
@@ -51,7 +47,6 @@ def main(filepath):
 
     #Turn the positions into numbers
     pos = str_to_array(pos)
-   
 
     #Turn the forces into numbers
     force = str_to_array(forces)
@@ -75,9 +70,9 @@ def main(filepath):
     #We want to plot force vs pos?
     #Can decide later
 
-
-    plot_force(force, time)
-    #plot_pos(pos, time)
+    
+    #plot_force(force, time)
+    plot_pos(pos, time)
     return
 
 
@@ -121,7 +116,7 @@ def plot_force(force, time):
     #Create force array contianing data of each axes
     forces  = [[],[],[],[],[],[]]
 
-    
+    """
     for i in force:
         forces[0].append(abs(i[0]))
         forces[1].append(abs(i[1]))
@@ -137,15 +132,15 @@ def plot_force(force, time):
         forces[3].append(i[3])
         forces[4].append(i[4])
         forces[5].append(i[5])
-    """
+    
 
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel("Time (S)")
     ax1.set_ylabel("Force (N)")
     
-    ax1.plot(time, forces[0],  label = "$F_x$", color="red")
-    ax1.plot(time, forces[1],  label = "$F_y$", color="green")
+    ax1.plot(time[0], forces[0],  label = "$F_x$", color="red")
+    ax1.plot(time[0], forces[1],  label = "$F_y$", color="green")
     #ax1.plot(time, forces[2],  label = "$F_z$", color="blue")
 
     #ax2 = ax1.twinx()
@@ -185,6 +180,6 @@ def plot_pos(pos, time):
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-    filepath = "C:/Users/User/Documents/Results/ori_frame_test/raw/sim_ori_rep.txt"
+    filepath = "C:/Users/User/Documents/Results/first_pass_test/raw/11_03_double.txt"
 
     main(filepath)
