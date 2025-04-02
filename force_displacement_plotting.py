@@ -70,10 +70,12 @@ def main(filepath):
     #We want to plot force vs pos?
     #Can decide later
 
+    start = 0
+    stop = 40000
     
     #plot_force_history(force, time)
     #plot_pos(pos, time)
-    plot_force_vectors(pos, force, time)
+    plot_force_vectors(pos[start:stop], force[start:stop], False)
 
     return
 
@@ -181,7 +183,7 @@ def plot_pos(pos, time):
 """
 Plots the force vectors in 3D space
 """
-def plot_force_vectors(pos,forces,time):   
+def plot_force_vectors(pos,forces,threeD):   
 
     
     #Previous force vector determines next starting position
@@ -207,11 +209,16 @@ def plot_force_vectors(pos,forces,time):
 
 
     #Create the axes and figure
-    ax = plt.figure().add_subplot(projection="3d")
 
-    ax.quiver(x, y, z, u, v, w, length = 0.01)
+    if threeD:
+        ax = plt.figure().add_subplot(projection="3d")
 
-    ax.set_aspect("equal")
+        ax.quiver(x, y, z, u, v, w, length = 0.01)
+
+        ax.set_aspect("equal")
+
+    else:
+        plt.quiver(x, y, u, v)
 
     plt.show()
 
