@@ -71,8 +71,10 @@ def main(filepath):
     #Can decide later
 
     
-    #plot_force(force, time)
-    plot_pos(pos, time)
+    #plot_force_history(force, time)
+    #plot_pos(pos, time)
+    plot_force_vectors(pos, force, time)
+
     return
 
 
@@ -110,7 +112,7 @@ def data_split(line):
 
 
 #Plot the  x vs y pos vs force
-def plot_force(force, time):
+def plot_force_history(force, time):
 
 
     #Create force array contianing data of each axes
@@ -138,10 +140,12 @@ def plot_force(force, time):
 
     ax1.set_xlabel("Time (S)")
     ax1.set_ylabel("Force (N)")
+
+    start_val = 1500
     
-    ax1.plot(time[0], forces[0],  label = "$F_x$", color="red")
-    ax1.plot(time[0], forces[1],  label = "$F_y$", color="green")
-    #ax1.plot(time, forces[2],  label = "$F_z$", color="blue")
+    ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="red")
+    ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="green")
+    ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="blue")
 
     #ax2 = ax1.twinx()
     #ax2.set_ylabel("Moment (N/m)")
@@ -174,12 +178,51 @@ def plot_pos(pos, time):
     return
 
 
+"""
+Plots the force vectors in 3D space
+"""
+def plot_force_vectors(pos,forces,time):   
+
+    
+    #Previous force vector determines next starting position
+    x = []
+    y = []
+    z = []
+    u = []
+    v = []
+    w = []
+
+    #Create the force vectors
+    for i in range(len(forces)):
+
+        #Starting position is based on previous vector direction
+        x.append(pos[i][0])
+        y.append(pos[i][1])
+        z.append(pos[i][2])
+
+        #current vector direction based on applied forces
+        u.append(forces[i][0])
+        v.append(forces[i][1])
+        w.append(forces[i][2])
 
 
+    #Create the axes and figure
+    ax = plt.figure().add_subplot(projection="3d")
+
+    ax.quiver(x, y, z, u, v, w, length = 0.01)
+
+    ax.set_aspect("equal")
+
+    plt.show()
+
+
+
+
+    return
 
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-    filepath = "C:/Users/User/Documents/Results/first_pass_test/raw/11_03_double.txt"
+    filepath = "C:/Users/User/Documents/Results/spiral_test/raw/07_03_newcal.txt"
 
     main(filepath)
