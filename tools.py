@@ -52,24 +52,41 @@ def str_to_array(arr):
 
 
 #Calculates the differences between an array of datetimes and calculates the total time passed
-def calc_time_passed(times):
-    time_passed = [0]
+def calc_time_passed(times, rust):
 
-    #For every time calculate the time between it and the previous 
-    i = 1
-    while i < len(times):
+    time_passed = []
 
-        #Convert strings to datetimes
-        #Remove the 7th character of the string so it can be parsed correctly
-        #We can't really work to that accuracy anyways
+    if(not rust):
 
-        curr_time = datetime.strptime(times[i][:-1], "%H:%M:%S.%f")
-        prev_time = datetime.strptime(times[i-1][:-1], "%H:%M:%S.%f")
+        time_passed = [0]
 
-        #Append the time difference
-        time_passed.append(time_passed[len(time_passed) - 1] + (curr_time - prev_time).total_seconds())
+        #For every time calculate the time between it and the previous 
+        i = 1
+        while i < len(times):
 
-        i = i + 1 
+            #Convert strings to datetimes
+            #Remove the 7th character of the string so it can be parsed correctly
+            #We can't really work to that accuracy anyways
+
+            curr_time = datetime.strptime(times[i][:-1], "%H:%M:%S.%f")
+            prev_time = datetime.strptime(times[i-1][:-1], "%H:%M:%S.%f")
+
+            #Append the time difference
+            time_passed.append(time_passed[len(time_passed) - 1] + (curr_time - prev_time).total_seconds())
+
+            i = i + 1 
+    else:
+                #For every time calculate the time between it and the previous 
+        i = 0
+        while i < len(times):
+            
+
+            #Append the time difference from the starting time
+            time_passed.append(float(times[i]) - float(times[0]))
+
+            i = i + 1 
+
+
 
     return time_passed
 

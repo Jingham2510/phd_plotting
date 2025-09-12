@@ -14,7 +14,7 @@ from tools import *
 
 
 #Organise the plotting
-def main(filepath):
+def main(filepath, rust):
 
     datetimes = []
     pos = []
@@ -28,7 +28,7 @@ def main(filepath):
             #Ensure line is empty
             if line:
                 #Split the line up
-                tokens = data_split(line)               
+                tokens = data_split(line, rust)               
                 
                 #Append the time data
                 datetimes.append(tokens[0])
@@ -43,7 +43,9 @@ def main(filepath):
 
 
     #Calculate the time differences 
-    time = calc_time_passed(datetimes)
+    time = calc_time_passed(datetimes, rust)
+
+
 
     #Turn the positions into numbers
     pos = str_to_array(pos)
@@ -55,6 +57,9 @@ def main(filepath):
     #Check that the data arrays are the same lengths
     if(not len(time) == len(pos) == len(forces)):
         print("DATA ARRAYS ARE INCONSISTENT LENGTH")
+
+        print(f"time: {len(time)}, pos: {len(pos)}, forces: {len(forces)}")
+
         raise Exception()
     
 
@@ -73,25 +78,28 @@ def main(filepath):
     start = 0
     stop = 40000
     
-    #plot_force_history(force, time)
-    #plot_pos(pos, time)
-    plot_force_vectors(pos[start:stop], force[start:stop], False)
+    plot_force_history(force, time)
+    #plot_pos(pos, time, True)
+    #plot_force_vectors(pos[start:stop], force[start:stop], False)
 
     return
 
 
 #Split the line up
 #Not the most efficient but thats okay for now 
-def data_split(line):
+def data_split(line, rust):
 
     tokens = []
 
     #Can remove the line number
     line = line[line.find(",") + 1:]
 
-    #Can remove the date - will always be same length
-    DATE_LENGTH = 11
-    line = line[DATE_LENGTH:]
+
+    if (not rust):        
+
+        #Can remove the date - will always be same length
+        DATE_LENGTH = 11
+        line = line[DATE_LENGTH:]
 
     #Save the time
     tokens.append(line[:line.find(",")])
@@ -109,6 +117,8 @@ def data_split(line):
     #Save the forces
     tokens.append(line[:line.find("]")]) 
 
+
+
     return tokens
 
 
@@ -120,34 +130,39 @@ def plot_force_history(force, time):
     #Create force array contianing data of each axes
     forces  = [[],[],[],[],[],[]]
 
-    """
-    for i in force:
-        forces[0].append(abs(i[0]))
-        forces[1].append(abs(i[1]))
-        forces[2].append(abs(i[2]))
-        forces[3].append(abs(i[3]))
-        forces[4].append(abs(i[4]))
-        forces[5].append(abs(i[5]))
-    """
+    
+    #for i in force:
+        #forces[0].append(abs(i[0]))
+        #forces[1].append(abs(i[1]))
+        #forces[2].append(abs(i[2]))
+        #forces[3].append(abs(i[3]))
+        #forces[4].append(abs(i[4]))
+        #forces[5].append(abs(i[5]))
+    
     for i in force:
         forces[0].append(i[0])
         forces[1].append(i[1])
         forces[2].append(i[2])
-        forces[3].append(i[3])
-        forces[4].append(i[4])
-        forces[5].append(i[5])
+        #forces[3].append(i[3])
+        #forces[4].append(i[4])
+        #forces[5].append(i[5])
     
 
     fig, ax1 = plt.subplots()
 
-    ax1.set_xlabel("Time (S)")
-    ax1.set_ylabel("Force (N)")
+    ax1.set_xlabel("Time (S)", fontsize=12)
+    ax1.set_ylabel("Force (N)", fontsize=12)
+    ax1.tick_params(axis="both", which="major", labelsize=12)
 
-    start_val = 1500
+
+    start_val = 0
     
     ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="red")
     ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="green")
     ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="blue")
+
+
+
 
     #ax2 = ax1.twinx()
     #ax2.set_ylabel("Moment (N/m)")
@@ -157,24 +172,49 @@ def plot_force_history(force, time):
     #ax2.plot(time, forces[5],  label = "$M_z$", color="cyan", linestyle="dashed", linewidth = "0.5")
     
     
-    fig.legend()
+    fig.legend(prop={"size": 16})
 
 
     plt.show()
 
 
-def plot_pos(pos, time):
+def plot_pos(pos, time, include_z):
 
     x = [i[0] for i in pos]
     y = [i[1] for i in pos]
 
+    if include_z:
+        z = [i[2] for i in pos]
 
-    plt.plot(x[10:], y[10:])
 
-    plt.xlabel("x (mm)")
-    plt.ylabel("y (mm)")
 
-    plt.show()
+    if not include_z:
+
+        plt.plot(x[10:], y[10:])
+
+        plt.xlabel("x (mm)", fontsize=12)
+        plt.ylabel("y (mm)", fontsize=12)
+        plt.tick_params(axis="both", which="major", labelsize=12)
+
+        plt.show()
+
+    else:
+
+        ax = plt.figure().add_subplot(projection='3d')
+
+
+        plt.plot(x[10:], y[10:], z[10:])
+
+        plt.xlabel("x (mm)", fontsize=12)
+        plt.ylabel("y (mm)", fontsize=12)
+        ax.set_zlabel("z (mm)", fontsize=12)
+        
+        plt.tick_params(axis="x", which="major", labelsize=12)
+        plt.xticks(range(261, 264))
+        plt.tick_params(axis="y", which="major", labelsize=12)
+        plt.tick_params(axis="z", which="major", labelsize=12)
+
+        plt.show()
 
 
     return
@@ -230,6 +270,6 @@ def plot_force_vectors(pos,forces,threeD):
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-    filepath = "C:/Users/User/Documents/Results/spiral_test/raw/07_03_newcal.txt"
+    filepath = "C:/Users/User/Documents/Results/rustbot_dumps/line_bugfix_3.txt"
 
-    main(filepath)
+    main(filepath, True)
