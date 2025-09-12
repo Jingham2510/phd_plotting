@@ -27,6 +27,11 @@ def comp_coverage(test_1_name, test_2_name):
         for line in f:
             cov_2.append(float(line.strip()))
 
+    #Remove the first values - as these will be outliars generated
+    #cov_1.pop(0)
+    #cov_2.pop(0)
+
+
 
     #Create a dictionary that holds the data
     data_dict = {test_1_name : cov_1, test_2_name : cov_2}
