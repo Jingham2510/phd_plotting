@@ -79,7 +79,7 @@ def main(filepath, rust_check):
     stop = 40000
     
     plot_force_history(force, time)
-    plot_pos(pos, time, True)
+    #plot_pos(pos, time, True)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
 
     return
@@ -157,9 +157,10 @@ def plot_force_history(force, time):
 
     start_val = 0
     
-    ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="red")
-    ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="green")
-    #ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="blue")
+    #Colours selected using https://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+    ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
+    ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
+    #ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
 
 
 
@@ -271,7 +272,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "22_10_circle"
+    test_name = "slow_no_data_circle"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
