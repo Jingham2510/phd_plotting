@@ -1,6 +1,7 @@
 
 from datetime import datetime
 import numpy as np
+from math import sqrt
 
 
 #From https://stackoverflow.com/questions/38066836/python-best-way-to-remove-char-from-string-by-index
@@ -122,3 +123,27 @@ def xyz_integ_avg(time, data):
     return [data_x, data_y, data_z]
 
 
+
+def calc_work(pos, forces, time):
+
+
+    work = []
+    cnt = 0
+    #Calculate the work at each timestep (ignoring the first step)
+    for i in range(len(forces)):
+        cnt = cnt + 1
+        if cnt == 0:
+            continue
+        
+        #Calculate the displacement change (i.e. 3d pythagoreans)
+        disp_change = sqrt(pow(pos[i][0] - pos[i-1][0], 2) + pow(pos[i][1] - pos[i-1][1], 2) + pow(pos[i][2] - pos[i-1][2], 2))
+
+        #Calculate the mid point of the avg force (assume median is avg?) - no moments for now 
+        #Also only 2d work dont include the z-measurement
+        force_avg = (((forces[i][0] + forces[i-1][0])/2) + ((forces[i][1] + forces[i -1][1])/2))/2
+
+        
+        #Store the work done as the absolute force * the absolute displacement change
+        work.append(abs(disp_change) * abs(force_avg))
+
+    return work

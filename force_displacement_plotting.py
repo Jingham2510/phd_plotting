@@ -82,7 +82,8 @@ def main(filepath, rust_check):
     #plot_force_history(force, time)
     #plot_pos(pos, time, True)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
-    plot_work_step(pos, force, time)
+    #plot_work_step(pos, force, time)
+    plot_work_over_time(pos, force, time)
 
     return
 
@@ -230,34 +231,7 @@ plots the work (displacement*force) at each step against time
 def plot_work_step(pos, forces, time):
 
 
-
-
-    work = []
-    cnt = 0
-    #Calculate the work at each timestep (ignoring the first step)
-    for i in range(len(forces)):
-        cnt = cnt + 1
-        if cnt == 0:
-            continue
-
-  
-
-        #Calculate the displacement change (i.e. 3d pythagoreans)
-        disp_change = sqrt(pow(pos[i][0] - pos[i-1][0], 2) + pow(pos[i][1] - pos[i-1][1], 2) + pow(pos[i][2] - pos[i-1][2], 2))
-
-        #Calculate the mid point of the avg force (assume median is avg?) - no moments for now 
-        #Also only 2d work dont include the z-measurement
-        force_avg = (((forces[i][0] + forces[i-1][0])/2) + ((forces[i][1] + forces[i -1][1])/2))/2
-
-        #Store the work done as the absolute force * the absolute displacement change
-        work.append(abs(disp_change) * abs(force_avg))
-
-
-    print(len(time))
-    print(len(work))
-
-    plt.plot(time, work)
-
+    plt.plot(time, calc_work(pos, forces, time))
 
 
     plt.xlabel("time(sec)", fontsize=12)
@@ -269,6 +243,36 @@ def plot_work_step(pos, forces, time):
 
     return
 
+
+"""
+Plot the total work over time
+"""
+def plot_work_over_time(pos, forces, time):
+
+
+    work_steps = calc_work(pos, forces, time)
+    curr_work = 0
+    total_work = []
+
+    for i in range(len(work_steps)):
+        curr_work += work_steps[i]
+        total_work.append(curr_work)
+
+
+    plt.plot(time, total_work)
+
+
+    plt.xlabel("time(sec)", fontsize=12)
+    plt.ylabel("Work done", fontsize=12)
+    plt.tick_params(axis="both", which="major", labelsize=12)
+
+    plt.show()
+
+
+
+
+
+    return
 """
 Plots the force vectors in 3D space
 """
