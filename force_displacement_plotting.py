@@ -21,6 +21,7 @@ def main(filepath, rust_check):
     pos = []
     ori = []
     forces = []
+    force_error = []
 
     #Open the file
     with open(filepath) as file:
@@ -41,6 +42,8 @@ def main(filepath, rust_check):
                 ori.append(tokens[2])
 
                 forces.append(tokens[3])
+
+                force_error.append(tokens[4])
 
 
     #Calculate the time differences 
@@ -79,10 +82,10 @@ def main(filepath, rust_check):
     start = 0
     stop = 40000
     
-    #plot_force_history(force, time)
-    #plot_pos(pos, time, True)
+    plot_force_history(force, time)
+    plot_pos(pos, time, True)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
-    #plot_work_step(pos, force, time)
+    plot_work_step(pos, force, time)
     plot_work_over_time(pos, force, time)
 
     return
@@ -119,8 +122,9 @@ def data_split(line, rust):
     line = line[line.find("]") + 2:] 
     #Save the forces
     tokens.append(line[:line.find("]")]) 
+    line = line[line.find("]") + 2:]
 
-
+    tokens.append(line)
 
     return tokens
 
@@ -146,33 +150,33 @@ def plot_force_history(force, time):
         forces[0].append(i[0])
         forces[1].append(i[1])
         forces[2].append(i[2])
-        #forces[3].append(i[3])
-        #forces[4].append(i[4])
-        #forces[5].append(i[5])
+        forces[3].append(i[3])
+        forces[4].append(i[4])
+        forces[5].append(i[5])
     
 
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel("Time (S)", fontsize=12)
-    ax1.set_ylabel("Force (N)", fontsize=12)
-    ax1.tick_params(axis="both", which="major", labelsize=12)
+    #ax1.set_ylabel("Force (N)", fontsize=12)
+    #ax1.tick_params(axis="both", which="major", labelsize=12)
 
 
     start_val = 0
     
     #Colours selected using https://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
-    ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
-    ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
-    #ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
+    #ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
+    #ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
+    ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
 
 
 
 
     #ax2 = ax1.twinx()
-    #ax2.set_ylabel("Moment (N/m)")
+    #ax1.set_ylabel("Moment (N/m)")
     
-    #ax2.plot(time, forces[3],  label = "$M_x$", color="darkorange", linestyle="dashed", linewidth = "0.5")
-    #ax2.plot(time, forces[4],  label = "$M_y$", color="navy", linestyle="dashed", linewidth = "0.5")
+    #ax1.plot(time, forces[3],  label = "$M_x$", color="darkorange", linestyle="dashed", linewidth = "0.5")
+    #ax1.plot(time, forces[4],  label = "$M_y$", color="navy", linestyle="dashed", linewidth = "0.5")
     #ax2.plot(time, forces[5],  label = "$M_z$", color="cyan", linestyle="dashed", linewidth = "0.5")
     
     
@@ -320,11 +324,25 @@ def plot_force_vectors(pos,forces,threeD):
 
     return
 
+
+
+#Plot the force error overtime
+def plot_force_error(error, time):
+
+    plt.plot(error, time)
+
+    plt.xlabel("time(sec)", fontsize=12)
+    plt.ylabel("Force Error (N)", fontsize=12)
+
+
+    return
+
+
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "slow_no_data_circle"
+    test_name = "step_polarity_test_-10"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
