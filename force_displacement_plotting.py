@@ -12,6 +12,7 @@ It will plot the position, forces, velocity and acceleration
 import matplotlib.pyplot as plt
 from tools import *
 from math import sqrt
+from statistics import fmean
 
 
 #Organise the plotting
@@ -57,6 +58,8 @@ def main(filepath, rust_check):
     #Turn the forces into numbers
     force = str_to_array(forces)
 
+    force_error = str_to_array(force_error)
+
 
     #Check that the data arrays are the same lengths
     if(not len(time) == len(pos) == len(forces)):
@@ -84,9 +87,11 @@ def main(filepath, rust_check):
     
     plot_force_history(force, time)
     plot_pos(pos, time, True)
+    plot_height(pos, time)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
-    plot_work_step(pos, force, time)
+    #plot_work_step(pos, force, time)
     plot_work_over_time(pos, force, time)
+    plot_force_error(force_error, time)
 
     return
 
@@ -169,6 +174,7 @@ def plot_force_history(force, time):
     #ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
     ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
 
+    
 
 
 
@@ -218,7 +224,6 @@ def plot_pos(pos, time, include_z):
         ax.set_zlabel("z (mm)", fontsize=12)
         
         plt.tick_params(axis="x", which="major", labelsize=12)
-        plt.xticks(range(261, 264))
         plt.tick_params(axis="y", which="major", labelsize=12)
         plt.tick_params(axis="z", which="major", labelsize=12)
 
@@ -228,6 +233,20 @@ def plot_pos(pos, time, include_z):
     return
 
 
+"""
+Plots the height over time
+"""
+def plot_height(pos, time):
+
+    z = [i[2] for i in pos]
+
+    plt.plot(time, z)
+    plt.xlabel("Time (sec)", fontsize=12)
+    plt.ylabel("Height (mm)", fontsize=12)
+
+    plt.show()
+
+    return
 
 """
 plots the work (displacement*force) at each step against time
@@ -319,9 +338,6 @@ def plot_force_vectors(pos,forces,threeD):
 
     plt.show()
 
-
-
-
     return
 
 
@@ -329,10 +345,23 @@ def plot_force_vectors(pos,forces,threeD):
 #Plot the force error overtime
 def plot_force_error(error, time):
 
-    plt.plot(error, time)
 
+    #Calculate the average force error over the whole thing and plot the line
+    error = [x[0] for x in error]
+    avg_err = fmean(error)
+    print(f"AVG ERR: {avg_err}")
+
+    plt.plot(time[1:], error[1:])
+    plt.axhline(avg_err, color = "r")
+    
+
+
+
+    plt.title("Force Error (variation from target)")
     plt.xlabel("time(sec)", fontsize=12)
     plt.ylabel("Force Error (N)", fontsize=12)
+
+    plt.show()
 
 
     return
@@ -342,7 +371,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "step_polarity_test_-10"
+    test_name = "geo_test_circle_5"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
