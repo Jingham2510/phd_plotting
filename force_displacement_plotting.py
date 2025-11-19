@@ -12,6 +12,7 @@ It will plot the position, forces, velocity and acceleration
 import matplotlib.pyplot as plt
 from tools import *
 from math import sqrt
+from statistics import fmean
 
 
 #Organise the plotting
@@ -57,6 +58,8 @@ def main(filepath, rust_check):
     #Turn the forces into numbers
     force = str_to_array(forces)
 
+    force_error = str_to_array(force_error)
+
 
     #Check that the data arrays are the same lengths
     if(not len(time) == len(pos) == len(forces)):
@@ -85,8 +88,9 @@ def main(filepath, rust_check):
     plot_force_history(force, time)
     plot_pos(pos, time, True)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
-    plot_work_step(pos, force, time)
+    #plot_work_step(pos, force, time)
     plot_work_over_time(pos, force, time)
+    plot_force_error(force_error, time)
 
     return
 
@@ -319,9 +323,6 @@ def plot_force_vectors(pos,forces,threeD):
 
     plt.show()
 
-
-
-
     return
 
 
@@ -329,10 +330,18 @@ def plot_force_vectors(pos,forces,threeD):
 #Plot the force error overtime
 def plot_force_error(error, time):
 
-    plt.plot(error, time)
+
+    #Calculate the average force error over the whole thing and plot the line
+    error = [x[0] for x in error]
+    avg_err = fmean(error)
+
+    plt.plot(time, error)
+    plt.axhline(avg_err, color = "r")
 
     plt.xlabel("time(sec)", fontsize=12)
     plt.ylabel("Force Error (N)", fontsize=12)
+
+    plt.show()
 
 
     return
@@ -342,7 +351,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "step_polarity_test_-10"
+    test_name = "prop_circle_-45"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
