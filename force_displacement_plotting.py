@@ -352,7 +352,7 @@ def plot_force_error(error, time):
     avg_err = fmean(error)
     print(f"AVG ERR: {avg_err}")
 
-    red_patch = mpatches.Patch(color="r", label = f"Avg: {avg_err}")
+    red_patch = mpatches.Patch(color="r", label = f"Avg: {round(avg_err, 3)}")
 
     plt.plot(time[1:], error[1:])
     plt.axhline(avg_err, color = "r")
