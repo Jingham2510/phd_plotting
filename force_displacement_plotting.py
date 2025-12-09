@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from tools import *
 from math import sqrt
 from statistics import fmean
+import matplotlib.patches as mpatches
 
 
 #Organise the plotting
@@ -90,7 +91,7 @@ def main(filepath, rust_check):
     plot_height(pos, time)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
     #plot_work_step(pos, force, time)
-    plot_work_over_time(pos, force, time)
+    #plot_work_over_time(pos, force, time)
     plot_force_error(force_error, time)
 
     return
@@ -351,11 +352,14 @@ def plot_force_error(error, time):
     avg_err = fmean(error)
     print(f"AVG ERR: {avg_err}")
 
+    red_patch = mpatches.Patch(color="r", label = f"Avg: {avg_err}")
+
     plt.plot(time[1:], error[1:])
     plt.axhline(avg_err, color = "r")
     
 
-
+    plt.grid(True)
+    plt.legend(handles=[red_patch])
 
     plt.title("Force Error (variation from target)")
     plt.xlabel("time(sec)", fontsize=12)
@@ -371,7 +375,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "geo_test_circle_5"
+    test_name = "phase2_-100_4"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
