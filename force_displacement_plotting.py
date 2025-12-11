@@ -174,6 +174,7 @@ def plot_force_history(force, time):
     #ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
     #ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
     ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
+    plt.grid(True)
 
     
 
@@ -210,6 +211,7 @@ def plot_pos(pos, time, include_z):
         plt.xlabel("x (mm)", fontsize=12)
         plt.ylabel("y (mm)", fontsize=12)
         plt.tick_params(axis="both", which="major", labelsize=12)
+        plt.grid(True)
 
         plt.show()
 
@@ -223,6 +225,7 @@ def plot_pos(pos, time, include_z):
         plt.xlabel("x (mm)", fontsize=12)
         plt.ylabel("y (mm)", fontsize=12)
         ax.set_zlabel("z (mm)", fontsize=12)
+        plt.grid(True)
         
         plt.tick_params(axis="x", which="major", labelsize=12)
         plt.tick_params(axis="y", which="major", labelsize=12)
@@ -244,6 +247,7 @@ def plot_height(pos, time):
     plt.plot(time, z)
     plt.xlabel("Time (sec)", fontsize=12)
     plt.ylabel("Height (mm)", fontsize=12)
+    plt.grid(True)
 
     plt.show()
 
@@ -289,7 +293,7 @@ def plot_work_over_time(pos, forces, time):
     plt.xlabel("time(sec)", fontsize=12)
     plt.ylabel("Work done", fontsize=12)
     plt.tick_params(axis="both", which="major", labelsize=12)
-
+    plt.grid(True)
     plt.show()
 
 
@@ -336,6 +340,8 @@ def plot_force_vectors(pos,forces,threeD):
 
     else:
         plt.quiver(x, y, u, v)
+
+    
 
     plt.show()
 
