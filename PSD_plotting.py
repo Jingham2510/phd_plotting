@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from os import listdir
 from math import sqrt
+from statistics import mean
 """
 This program opens up a folder of TSV (tab-seperated value) files contianing particle size distribution data
 Goes through the number-suffixed ones and plots the PSD data, whilst also tracking the range of different values provided for each
@@ -94,6 +95,8 @@ def main(folderpath, manual = False):
             cum_dic.pop(key)
             print(f"KEY {key} REMOVED")
 
+    
+
     #print(cum_dic)
     #print(dide_dic)
 
@@ -111,9 +114,9 @@ def main(folderpath, manual = False):
     create_box_plot(dide_dic, "Distribution Density Statistical Distribution", "Particle size (umm)", "Cumulative Distribution (%)")
 
 
-    #Plot the variance of each value
 
-    #Plot the mean (w/error bars)
+    plot_both_means(cum_dic, dide_dic, "Soil particle distribution", "Particle size(umm)")
+
     return
 
 
@@ -193,12 +196,13 @@ def create_all_plots(val_dict, num_of_subplots, title, x_lab, y_lab):
         print(f"{i} - Row{row_cnt}, Col{col_cnt}")
 
         if num_of_subplots > 1:
-
             axs[row_cnt, col_cnt].plot(x, y)
             axs[row_cnt, col_cnt].set_xscale("log")
+            axs[row_cnt, col_cnt].grid(True)
         else:
             axs.plot(x, y)
             axs.set_xscale("log")
+            axs.grid(True)
         
 
 
@@ -207,7 +211,6 @@ def create_all_plots(val_dict, num_of_subplots, title, x_lab, y_lab):
     fig.suptitle(title)
     fig.supxlabel(x_lab)
     fig.supylabel(y_lab)
-
 
 
     plt.show()
@@ -221,12 +224,32 @@ def create_box_plot(val_dict, title, x_lab, y_lab):
 
     fig = plt.boxplot(data_pnts)
 
+    plt.grid(True)
+
     plt.title(title)
-
-
 
     plt.show()
 
+    return
+
+
+
+#Calculates the means of each set of dictionaries and plots the results on the same graph
+def plot_both_means(cum_dict, dide_dict, title, x_lab):
+
+    x_cum = cum_dict.keys()
+    x_dide = dide_dict.keys()
+
+
+    y_cum = [mean(val) for val in cum_dict.values()]
+    y_dide = [mean(val) for val in dide_dict.values()]
+
+
+    fig, ax = plt.plot(x_cum, y_cum, x_dide, y_dide)
+
+    
+
+    plt.show()
 
     return
 
@@ -238,5 +261,5 @@ if __name__ == "__main__":
     folderpath = "C:/Users/User/Documents/Results/SOil Characterisation/PSD_csvs"
 
 
-    #main(folderpath, False)
+    main(folderpath, False)
     main(folderpath, True)

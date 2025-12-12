@@ -29,8 +29,8 @@ def main(filepath, rust_check):
     with open(filepath) as file:
         #Go through every line
         for line in file:
-            #Ensure line is empty
-            if line:
+            #Ensure line isnt empty
+            if line and not(line.startswith("!")):
                 #Split the line up
                 tokens = data_split(line, rust_check)               
                 
@@ -86,13 +86,16 @@ def main(filepath, rust_check):
     start = 0
     stop = 40000
     
+
+    print(f"Settling time: {max(time)}")
+
     plot_force_history(force, time)
-    plot_pos(pos, time, True)
+    #plot_pos(pos, time, True)
     plot_height(pos, time)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
     #plot_work_step(pos, force, time)
     #plot_work_over_time(pos, force, time)
-    plot_force_error(force_error, time)
+    plot_force_error(force_error[22:], time[22:])
 
     return
 
@@ -160,6 +163,8 @@ def plot_force_history(force, time):
         forces[4].append(i[4])
         forces[5].append(i[5])
     
+
+    print(f"MIN FORCE:{min(forces[2])}")
 
     fig, ax1 = plt.subplots()
 
@@ -381,7 +386,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "phase2_-100_4"
+    test_name = "newphase2-300_test"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
