@@ -95,7 +95,7 @@ def main(filepath, rust_check):
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
     #plot_work_step(pos, force, time)
     #plot_work_over_time(pos, force, time)
-    plot_force_error(force_error[22:], time[22:])
+    plot_force_error(force_error[10:], time[10:])
 
     return
 
@@ -386,7 +386,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "newphase2-300_test"
+    test_name = "geo_phase2-5_1"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 

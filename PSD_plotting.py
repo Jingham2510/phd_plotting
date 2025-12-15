@@ -109,13 +109,13 @@ def main(folderpath, manual = False):
     #-------Statistical analysis of results----------
 
     #Create boxplot of individual values
-    create_box_plot(cum_dic, "Cumulative Distribution Particle Size Statistical Distribution", "Particle size (umm)", "Cumulative Distribution (%)")
+    #create_box_plot(cum_dic, "Cumulative Distribution Particle Size Statistical Distribution", "Particle size (umm)", "Cumulative Distribution (%)")
     
-    create_box_plot(dide_dic, "Distribution Density Statistical Distribution", "Particle size (umm)", "Cumulative Distribution (%)")
+    #create_box_plot(dide_dic, "Distribution Density Statistical Distribution", "Particle size (umm)", "Cumulative Distribution (%)")
 
 
 
-    plot_both_means(cum_dic, dide_dic, "Soil particle distribution", "Particle size(umm)")
+    plot_both_means(cum_dic, dide_dic)
 
     return
 
@@ -234,22 +234,60 @@ def create_box_plot(val_dict, title, x_lab, y_lab):
 
 
 
-#Calculates the means of each set of dictionaries and plots the results on the same graph
-def plot_both_means(cum_dict, dide_dict, title, x_lab):
+#Calculates the means of each set of dictionaries and plots the results on seperate graphs
+def plot_both_means(cum_dict, dide_dict):
 
+    #Plot font
+    plt_font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 16}
+
+
+    #Tick font
+    title_font ={'family' : 'normal',
+        'size'   : 16}
+
+    #Generate the axis values
     x_cum = cum_dict.keys()
-    x_dide = dide_dict.keys()
-
-
     y_cum = [mean(val) for val in cum_dict.values()]
-    y_dide = [mean(val) for val in dide_dict.values()]
 
 
-    fig, ax = plt.plot(x_cum, y_cum, x_dide, y_dide)
+    fig = plt.plot(x_cum, y_cum,  color="#7570b3")
 
     
+    plt.tick_params("both", which="major", labelsize=14)
+    plt.ylim([0, 100])
+    plt.text(100, 60, "D60", fontdict=plt_font)
+    plt.axhline(60, color = "r", linestyle="--")
+    plt.text(100, 30, "D30",fontdict=plt_font)
+    plt.axhline(30, color = "r", linestyle="--")
+    plt.text(100, 10, "D10",fontdict=plt_font)
+    plt.axhline(10, color = "r", linestyle="--")
+    
 
+    plt.title("Cumulative distribution of DKS grains", fontdict=title_font)
+    plt.xscale("log")
+    plt.xlabel("Particle Size (umm)", size=16)    
+    plt.ylabel("Cumulative Distribution (%)", size=16)
+
+    plt.grid(True)
     plt.show()
+
+
+    x_dide = dide_dict.keys()
+    y_dide = [mean(val) for val in dide_dict.values()]
+    fig = plt.plot(x_dide, y_dide, color="#7570b3")
+
+    plt.tick_params("both", which="major", labelsize=14)
+    plt.title("Density distribution of DKS grains", fontdict=title_font)
+    plt.xscale("log")
+    plt.xlabel("Particle Size (umm)", size=16)    
+    plt.ylabel("Density distribution (log(%))", size=16)
+
+    plt.grid(True)
+    plt.show()
+
+
 
     return
 
