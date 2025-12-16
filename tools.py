@@ -4,6 +4,45 @@ import numpy as np
 from math import sqrt
 
 
+
+#Split the line up
+#Not the most efficient but thats okay for now 
+def data_split(line, rust):
+
+    tokens = []
+
+    #Can remove the line number
+    line = line[line.find(",") + 1:]
+
+    if (not rust):        
+
+        #Can remove the date - will always be same length
+        DATE_LENGTH = 11
+        line = line[DATE_LENGTH:]
+
+    #Save the time
+    tokens.append(line[:line.find(",")])
+
+    #Remove the time 
+    line = line[line.find(",") + 2:]
+
+    #Save the positions
+    tokens.append(line[:line.find("]")])
+    line = line[line.find("]") + 2:]
+
+    #Save the orientations
+    tokens.append(line[:line.find("]")])  
+    line = line[line.find("]") + 2:] 
+    #Save the forces
+    tokens.append(line[:line.find("]")]) 
+    line = line[line.find("]") + 2:]
+
+    tokens.append(line)
+
+    return tokens
+
+
+
 #From https://stackoverflow.com/questions/38066836/python-best-way-to-remove-char-from-string-by-index
 #Removes a character from a given index
 def remove(s, indx):
@@ -147,3 +186,4 @@ def calc_work(pos, forces, time):
         work.append(abs(disp_change) * abs(force_avg))
 
     return work
+

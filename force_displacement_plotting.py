@@ -16,6 +16,9 @@ from statistics import fmean
 import matplotlib.patches as mpatches
 
 
+phase2_marker = -1
+phase3_marker = -1
+
 #Organise the plotting
 def main(filepath, rust_check):
 
@@ -25,6 +28,7 @@ def main(filepath, rust_check):
     forces = []
     force_error = []
 
+    line_cnt = 0
     #Open the file
     with open(filepath) as file:
         #Go through every line
@@ -46,7 +50,16 @@ def main(filepath, rust_check):
                 forces.append(tokens[3])
 
                 force_error.append(tokens[4])
+            elif line.startswith(("!")) and "PHASE 2 STARTED" in line:
+                phase2_marker = line_cnt
+            elif line.startswith(("!")) and "PHASE 3 STARTED" in line:
+                phase3_marker = line_cnt
 
+            line_cnt = line_cnt + 1
+
+
+    print(f"2:{phase2_marker}")
+    print(f"3:{phase3_marker}")
 
     #Calculate the time differences 
     time = calc_time_passed(datetimes, rust_check)
@@ -90,52 +103,18 @@ def main(filepath, rust_check):
     print(f"Settling time: {max(time)}")
 
     plot_force_history(force, time)
-    #plot_pos(pos, time, True)
+    plot_pos(pos, time, False)
     plot_height(pos, time)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
     #plot_work_step(pos, force, time)
     #plot_work_over_time(pos, force, time)
-    plot_force_error(force_error[10:], time[10:])
+    plot_force_error(force_error[phase2_marker:phase3_marker], time[phase2_marker:phase3_marker:])
+    plot_force_error(force_error[phase3_marker:], time[phase3_marker:])
 
     return
 
 
-#Split the line up
-#Not the most efficient but thats okay for now 
-def data_split(line, rust):
 
-    tokens = []
-
-    #Can remove the line number
-    line = line[line.find(",") + 1:]
-
-
-    if (not rust):        
-
-        #Can remove the date - will always be same length
-        DATE_LENGTH = 11
-        line = line[DATE_LENGTH:]
-
-    #Save the time
-    tokens.append(line[:line.find(",")])
-
-    #Remove the time 
-    line = line[line.find(",") + 2:]
-
-    #Save the positions
-    tokens.append(line[:line.find("]")])
-    line = line[line.find("]") + 2:]
-
-    #Save the orientations
-    tokens.append(line[:line.find("]")])  
-    line = line[line.find("]") + 2:] 
-    #Save the forces
-    tokens.append(line[:line.find("]")]) 
-    line = line[line.find("]") + 2:]
-
-    tokens.append(line)
-
-    return tokens
 
 
 
@@ -176,8 +155,8 @@ def plot_force_history(force, time):
     start_val = 0
     
     #Colours selected using https://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
-    #ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
-    #ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
+    ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
+    ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
     ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
     plt.grid(True)
 
@@ -386,7 +365,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "geo_phase2-5_1"
+    test_name = "geo_wiggle_PID_comp"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
