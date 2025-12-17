@@ -29,6 +29,8 @@ def main(filepath, rust_check):
     force_error = []
 
     line_cnt = 0
+    phase2_marker = -1
+    phase3_marker = -1
     #Open the file
     with open(filepath) as file:
         #Go through every line
@@ -365,7 +367,7 @@ if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
 
-    test_name = "geo_wiggle_PID_comp"
+    test_name = "PID2_wiggle-5_1"
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
