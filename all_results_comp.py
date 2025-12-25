@@ -17,8 +17,17 @@ Main is currently setup for comparing PHPID and PID erros for the geotechnical 3
 def PHPID_PID_comp(folderpath):
 
     prefixes = ["PHPID", "PID1", "PID2"]
+    targets = [5, 10, 25, 50, 100, 200, 300, 400]
+
 
     avg_errs = {"PHPID":[],"PID1":[],"PID2":[]}
+
+    phase2_errs = []
+    phase2_percentage_errs = []
+
+    phase3_errs = []
+    phase3_percentage_errs = []
+
 
     #Go through every prefix and get the average error for each run
     for prefix in prefixes:
@@ -26,8 +35,86 @@ def PHPID_PID_comp(folderpath):
         avg_errs[prefix] = get_avg_force_err(folderpath, prefix)
 
 
+        #PHASE 2 ----------
+        phase_2_avgs = list(mean(avg_errs[prefix][1][x]) for x in targets)
+        phase_2_percentage_err = []
+
+        for i in range(len(phase_2_avgs)):
+            phase_2_percentage_err.append(abs((phase_2_avgs[i]/targets[i]) * 100))
+
+        phase2_errs.append(phase_2_avgs)
+        phase2_percentage_errs.append(phase_2_percentage_err)
+        
+
+        #PHASE 3 ---------
+        phase_3_avgs = list(mean(avg_errs[prefix][2][x]) for x in targets)
+        phase_3_percentage_err = []
+        for i in range(len(phase_3_avgs)):
+            phase_3_percentage_err.append(abs((phase_3_avgs[i]/targets[i]) * 100))
+
+
+        phase3_errs.append(phase_3_avgs)
+        phase3_percentage_errs.append(phase_3_percentage_err)
     
+
+    #PHASE 2 PLOTS ----
+
+    #------MAGNITUDE-----
+    print("PHASE 2 MAGNITUDE")
+    plt.plot(targets, phase2_errs[0], color="#1b9e77", label = "PHPID", marker = "o")
+    plt.plot(targets, phase2_errs[1], color="#d95f02", label = "PID", marker = "o")
+
+    plt.xticks(targets)
+    plt.xlabel("Force Target (N)")
+    plt.ylabel("Average Error (N)")
+    plt.grid(True)
     
+    plt.legend()
+    plt.show()
+
+    #PERCENTAGE ERROR
+    print("PHASE 2 PERCENTAGE ERROR")
+    plt.plot(targets, phase2_percentage_errs[0], color="#1b9e77", label = "PHPID", marker = "o")
+    plt.plot(targets, phase2_percentage_errs[1], color="#d95f02", label = "PID", marker = "o")
+
+    plt.xticks(targets)
+    plt.xlabel("Force Target (N)")
+    plt.ylabel("Average Error (%)")
+    plt.grid(True)
+    
+    plt.legend()
+    plt.show()
+    
+
+    #PHASE 3 PLOTS -----
+ #------MAGNITUDE-----
+    print("PHASE 3 MAGNITUDE")
+    plt.plot(targets, phase3_errs[0], color="#1b9e77", label = "PHPID", marker = "o")
+    plt.plot(targets, phase3_errs[1], color="#d95f02", label = "PID(Hi)", marker = "o")    
+    plt.plot(targets, phase3_errs[2], color="#7570b3", label = "PID(Lo)", marker = "o")
+
+    plt.xticks(targets)
+    plt.xlabel("Force Target (N)")
+    plt.ylabel("Average Error (N)")
+    plt.grid(True)
+    
+    plt.legend()
+    plt.show()
+
+    #PERCENTAGE ERROR
+    print("PHASE 3 PERCENTAGE ERROR")
+    plt.plot(targets, phase3_percentage_errs[0], color="#1b9e77", label = "PHPID", marker = "o")
+    plt.plot(targets, phase3_percentage_errs[1], color="#d95f02", label = "PID(Hi)", marker = "o")
+    plt.plot(targets, phase3_percentage_errs[2], color="#7570b3", label = "PID(Lo)", marker = "o")
+
+    plt.xticks(targets)
+    plt.xlabel("Force Target (N)")
+    plt.ylabel("Average Error (%)")
+    plt.grid(True)
+    
+    plt.legend()
+    plt.show()
+
 
     return
 
@@ -84,8 +171,8 @@ def get_avg_force_err(folderpath, prefix):
 
 
     #print the average force errors
-    for key in total_force_err.keys():
-        print(f"{key} TOTAL AVG - {mean(total_force_err[key])}, P2 AVG - {mean(phase2_force_err[key])}, P3 - {mean(phase3_force_err[key])} \n")
+        #for key in total_force_err.keys():
+        #   print(f"{key} TOTAL AVG - {mean(total_force_err[key])}, P2 AVG - {mean(phase2_force_err[key])}, P3 - {mean(phase3_force_err[key])} \n")
        
     
 
@@ -94,6 +181,7 @@ def get_avg_force_err(folderpath, prefix):
 
 
 #Get phase2 and phase3 force errors
+#DATA STRUCTURE 
 def get_phase_errs(folderpath, prefix):
     phase2_force_err = {}
     phase3_force_err = {}
@@ -105,13 +193,13 @@ def get_phase_errs(folderpath, prefix):
             #Get the data for that file
             data = get_data((folderpath+file+"/data_"+file+".txt"))
             #Get the force errors
-            data_ferr = data["force error"]
+            data_ferr = concatenate(data["force error"])
 
             phase_2_mark = data["phase 2 marker"]
             phase_3_mark = data["phase 3 marker"]
 
             #Group the file based on the force target (calc from a force and force error)
-            target = round(data_ferr[0] - data["force"][0])
+            target = round(data_ferr[0] - data["forces"][0][2])
 
             #Append the data in the force error to the relevant section of the dictionary
             if target in phase2_force_err.keys():
@@ -121,9 +209,9 @@ def get_phase_errs(folderpath, prefix):
 
             #Append the data in the force error to the relevant section of the dictionary
             if target in phase3_force_err.keys():
-                phase3_force_err[target].append(data_ferr[:phase_3_mark])
+                phase3_force_err[target].append(data_ferr[phase_3_mark:])
             else:
-                phase3_force_err[target] = data_ferr[:phase_3_mark]
+                phase3_force_err[target] = [data_ferr[phase_3_mark:]]
 
 
     return [phase2_force_err, phase3_force_err]
@@ -139,48 +227,54 @@ def PHPID_PID_box_comp(folderpath):
 
     errs = {"PHPID":[],"PID1":[],"PID2":[]}
 
+    targets = [-5, -10, -25, -50, -100, -200, -300, -400]
+
     #Go through every prefix and get the error for the phases of each run
-    for prefix in prefixes:
-        print(f"----{prefix}----\n")
+    for prefix in prefixes:      
         errs[prefix] = get_phase_errs(folderpath, prefix)
 
 
-    #Set up the figure to store all the subfigures
-    ROW_MAX = 3
-    COL_MAX = 2
-    fig,axs = plt.subplots(ROW_MAX, COL_MAX)
-    row_cnt = 0
-    col_cnt = 0
 
     
-
-    #Go through each prefix and create the plot
-    for prefix in prefixes:
-        #Reset the pointer
-        if col_cnt == COL_MAX-1:
-            row_cnt = row_cnt + 1
-            col_cnt = 0
-
-        axs(row_cnt,col_cnt) = plt.boxplot(errs[prefix][col_cnt])
-        col_cnt = col_cnt + 1
-        axs(row_cnt,col_cnt) = plt.boxplot(errs[prefix][col_cnt])
-
+    for targ in targets:
+            #Set up the figure to store all the subfigures
+        ROW_MAX = 3
+        COL_MAX = 2
+        fig,axs = plt.subplots(ROW_MAX, COL_MAX)
         
+        row_cnt = 0
+        col_cnt = 0
+
+        #Go through each prefix and create the plot
+        for prefix in prefixes:
+            print(f"----{prefix}----\n")
+            #Reset the pointer
+            if col_cnt == COL_MAX-1:
+                row_cnt = row_cnt + 1
+                col_cnt = 0
+            print(f"{row_cnt}, {col_cnt}")
+            axs[row_cnt,col_cnt].boxplot(errs[prefix][col_cnt][targ], showfliers=False)
+            col_cnt = col_cnt + 1
+            axs[row_cnt,col_cnt].boxplot(errs[prefix][col_cnt][targ], showfliers=False)
+
+            
 
 
-  
-    #Setup the figure
-    fig.suptitle("Phase error Comparison")
+    
+        #Setup the figure
+        fig.suptitle(f"Phase error comparison - target = -{targ}")
 
 
-    for ax, row in zip(axs[:, 0],prefixes):
-        ax.set_title(row)
+        #for ax, row in zip(axs[:, 0],prefixes):
+        #   ax.set_title(row)
 
-    for ax, col in zip(axs[:, 0], ["Phase 2", "Phase 3"]):
-        ax.set_title(col)    
+        #for ax, col in zip(axs[:, 0], ["Phase 2", "Phase 3"]):
+        #   ax.set_title(col)    
 
 
-    plt.show()
+        fig.show()
+        plt.show()
+        fig.clear()
     
 
     return
@@ -271,3 +365,5 @@ if __name__ == "__main__":
     folderpath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\"
 
     PHPID_PID_comp(folderpath)
+
+    #PHPID_PID_box_comp(folderpath)

@@ -63,6 +63,7 @@ def str_to_array(arr):
 
     real_arr = []
 
+ 
     #Go through every point in the array
     for x in arr:
         

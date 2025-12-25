@@ -39,6 +39,8 @@ def main(filepath, rust_check):
             if line and not(line.startswith("!")):
                 #Split the line up
                 tokens = data_split(line, rust_check)               
+               
+                
                 
                 #Append the time data
                 datetimes.append(tokens[0])
@@ -51,7 +53,8 @@ def main(filepath, rust_check):
 
                 forces.append(tokens[3])
 
-                force_error.append(tokens[4])
+                if rust_check:
+                    force_error.append(tokens[4])
             elif line.startswith(("!")) and "PHASE 2 STARTED" in line:
                 phase2_marker = line_cnt
             elif line.startswith(("!")) and "PHASE 3 STARTED" in line:
@@ -60,8 +63,8 @@ def main(filepath, rust_check):
             line_cnt = line_cnt + 1
 
 
-    print(f"2:{phase2_marker}")
-    print(f"3:{phase3_marker}")
+    #print(f"2:{phase2_marker}")
+    #print(f"3:{phase3_marker}")
 
     #Calculate the time differences 
     time = calc_time_passed(datetimes, rust_check)
@@ -74,7 +77,8 @@ def main(filepath, rust_check):
     #Turn the forces into numbers
     force = str_to_array(forces)
 
-    force_error = str_to_array(force_error)
+    if rust_check:
+        force_error = str_to_array(force_error)
 
 
     #Check that the data arrays are the same lengths
@@ -105,16 +109,30 @@ def main(filepath, rust_check):
     print(f"Settling time: {max(time)}")
 
     plot_force_history(force, time)
-    plot_pos(pos, time, False)
+    #highlight_three_phase(force, time, phase2_marker, phase3_marker)
+    #plot_pos(pos, time, False)
     plot_height(pos, time)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
     #plot_work_step(pos, force, time)
-    #plot_work_over_time(pos, force, time)
-    plot_force_error(force_error[phase2_marker:phase3_marker], time[phase2_marker:phase3_marker:])
-    plot_force_error(force_error[phase3_marker:], time[phase3_marker:])
+    plot_work_over_time(pos, force, time)
+    #plot_z_velocity(vels[2], time)
+    
+
+    #Ensure that the phase markers have been found before trying to isolate the force-phase data
+    #Plot up to phase 2 (i.e. plot phase 1)
+    if phase2_marker > 0 and False:
+        plot_force_error(force_error[:phase2_marker], time[:phase2_marker])
+    #Plot phase 2 to phase 3 marker
+    if phase2_marker > 0 and phase3_marker > 0:
+        plot_force_error(force_error[phase2_marker:phase3_marker-1], time[phase2_marker:phase3_marker-1])
+    #No phase 3 marker so just plot post-phase 2 
+    elif phase2_marker > 0:
+        plot_force_error(force_error[phase2_marker:], time[phase2_marker:])
+        #Plot post phase 3 marker
+    if phase3_marker > 0:
+        plot_force_error(force_error[phase3_marker:], time[phase3_marker:])
 
     return
-
 
 
 
@@ -150,15 +168,15 @@ def plot_force_history(force, time):
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel("Time (S)", fontsize=12)
-    #ax1.set_ylabel("Force (N)", fontsize=12)
-    #ax1.tick_params(axis="both", which="major", labelsize=12)
+    ax1.set_ylabel("Force (N)", fontsize=12)
+    ax1.tick_params(axis="both", which="major", labelsize=12)
 
 
     start_val = 0
     
     #Colours selected using https://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
-    ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
-    ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
+    #ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
+    #ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
     ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
     plt.grid(True)
 
@@ -194,9 +212,9 @@ def plot_pos(pos, time, include_z):
 
         plt.plot(x[10:], y[10:])
 
-        plt.xlabel("x (mm)", fontsize=12)
-        plt.ylabel("y (mm)", fontsize=12)
-        plt.tick_params(axis="both", which="major", labelsize=12)
+        plt.xlabel("x (mm)", fontsize=24)
+        plt.ylabel("y (mm)", fontsize=24)
+        plt.tick_params(axis="both", which="major", labelsize=24)
         plt.grid(True)
 
         plt.show()
@@ -208,14 +226,14 @@ def plot_pos(pos, time, include_z):
 
         plt.plot(x[10:], y[10:], z[10:])
 
-        plt.xlabel("x (mm)", fontsize=12)
-        plt.ylabel("y (mm)", fontsize=12)
-        ax.set_zlabel("z (mm)", fontsize=12)
+        plt.xlabel("x (mm)", fontsize=24)
+        plt.ylabel("y (mm)", fontsize=24)
+        ax.set_zlabel("z (mm)", fontsize=24)
         plt.grid(True)
         
-        plt.tick_params(axis="x", which="major", labelsize=12)
-        plt.tick_params(axis="y", which="major", labelsize=12)
-        plt.tick_params(axis="z", which="major", labelsize=12)
+        plt.tick_params(axis="x", which="major", labelsize=24)
+        plt.tick_params(axis="y", which="major", labelsize=24)
+        plt.tick_params(axis="z", which="major", labelsize=24)
 
         plt.show()
 
@@ -231,8 +249,10 @@ def plot_height(pos, time):
     z = [i[2] for i in pos]
 
     plt.plot(time, z)
-    plt.xlabel("Time (sec)", fontsize=12)
-    plt.ylabel("Height (mm)", fontsize=12)
+    plt.xlabel("Time (sec)", fontsize=24)
+    plt.ylabel("Height (mm)", fontsize=24)
+    plt.tick_params(axis="x", which="major", labelsize=24)
+    plt.tick_params(axis="y", which="major", labelsize=24)
     plt.grid(True)
 
     plt.show()
@@ -251,6 +271,19 @@ def plot_work_step(pos, forces, time):
     plt.xlabel("time(sec)", fontsize=12)
     plt.ylabel("Work at step (J)", fontsize=12)
     plt.tick_params(axis="both", which="major", labelsize=12)
+
+    plt.show()
+
+
+    return
+
+
+def plot_z_velocity(z_vel, time):
+
+    plt.plot(time, z_vel)
+
+    plt.xlabel("time(sec)")
+    plt.ylabel("Velocity (mm/s)")
 
     plt.show()
 
@@ -277,7 +310,7 @@ def plot_work_over_time(pos, forces, time):
 
 
     plt.xlabel("time(sec)", fontsize=12)
-    plt.ylabel("Work done", fontsize=12)
+    plt.ylabel("Work done (J)", fontsize=12)
     plt.tick_params(axis="both", which="major", labelsize=12)
     plt.grid(True)
     plt.show()
@@ -346,14 +379,14 @@ def plot_force_error(error, time):
 
     red_patch = mpatches.Patch(color="r", label = f"Avg: {round(avg_err, 3)}")
 
-    plt.plot(time[1:], error[1:])
+    plt.plot(time, error)
     plt.axhline(avg_err, color = "r")
     
 
     plt.grid(True)
     plt.legend(handles=[red_patch])
 
-    plt.title("Force Error (variation from target)")
+    #plt.title("Force Error (variation from target)")
     plt.xlabel("time(sec)", fontsize=12)
     plt.ylabel("Force Error (N)", fontsize=12)
 
@@ -363,12 +396,85 @@ def plot_force_error(error, time):
     return
 
 
+def highlight_three_phase(force, time, phase2_marker, phase3_marker):
+        #Create force array contianing data of each axes
+    forces  = [[],[],[],[],[],[]]
+
+    
+    #for i in force:
+        #forces[0].append(abs(i[0]))
+        #forces[1].append(abs(i[1]))
+        #forces[2].append(abs(i[2]))
+        #forces[3].append(abs(i[3]))
+        #forces[4].append(abs(i[4]))
+        #forces[5].append(abs(i[5]))
+    
+    for i in force:
+        forces[0].append(i[0])
+        forces[1].append(i[1])
+        forces[2].append(i[2])
+        forces[3].append(i[3])
+        forces[4].append(i[4])
+        forces[5].append(i[5])
+    
+
+    print(f"MIN FORCE:{min(forces[2])}")
+
+    fig, ax1 = plt.subplots()
+
+    ax1.set_xlabel("Time (S)", fontsize=24)
+    ax1.set_ylabel("Force (N)", fontsize=24)
+    ax1.tick_params(axis="both", which="major", labelsize=24)
+
+
+    start_val = 0
+    
+    #Colours selected using https://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+    #ax1.plot(time[start_val:], forces[0][start_val:],  label = "$F_x$", color="#1b9e77")
+    #ax1.plot(time[start_val:], forces[1][start_val:],  label = "$F_y$", color="#d95f02")
+    ax1.plot(time[start_val:], forces[2][start_val:],  label = "$F_z$", color="#7570b3")
+    plt.grid(True)
+
+    
+
+
+
+    #ax2 = ax1.twinx()
+    #ax1.set_ylabel("Moment (N/m)")
+    
+    #ax1.plot(time, forces[3],  label = "$M_x$", color="darkorange", linestyle="dashed", linewidth = "0.5")
+    #ax1.plot(time, forces[4],  label = "$M_y$", color="navy", linestyle="dashed", linewidth = "0.5")
+    #ax2.plot(time, forces[5],  label = "$M_z$", color="cyan", linestyle="dashed", linewidth = "0.5")
+    
+    
+    fig.legend(prop={"size": 24})
+
+
+    #Also plot the markers for the relevant phases
+    ax1.vlines(time[phase2_marker], max(forces[2]) + 10, min(force[2]) - 20, "red", "--")
+    ax1.vlines(time[phase3_marker], max(forces[2])+ 10, min(force[2]) -  20, "red", "--")
+
+
+    phase_mark_text = {"weight":"semibold",
+                       "size":24}
+
+    ax1.text(time[phase2_marker] - 4, -170, "PHASE 1", phase_mark_text)
+
+    ax1.text(time[phase2_marker] + 4, -300, "PHASE 2", phase_mark_text)
+
+    ax1.text(time[phase3_marker] + 4, -300, "PHASE 3", phase_mark_text)
+
+
+    plt.show()
+
+
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-
-    test_name = "PID2_wiggle-5_1"
+    test_name = "no_phase2-200_2"
+    #test_name = "speed-500_5"
+    CAPTURED_USING_RUST = True
 
     filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
-    main(filepath, True)
+    main(filepath, CAPTURED_USING_RUST)
