@@ -65,11 +65,11 @@ def PHPID_PID_comp(folderpath):
     plt.plot(targets, phase2_errs[1], color="#d95f02", label = "PID", marker = "o")
 
     plt.xticks(targets)
-    plt.xlabel("Force Target (N)")
-    plt.ylabel("Average Error (N)")
+    plt.xlabel("Force Target (N)", size = 18)
+    plt.ylabel("Average Error (N)", size = 18)
     plt.grid(True)
     
-    plt.legend()
+    plt.legend(fontsize = 18)
     plt.show()
 
     #PERCENTAGE ERROR
@@ -78,11 +78,11 @@ def PHPID_PID_comp(folderpath):
     plt.plot(targets, phase2_percentage_errs[1], color="#d95f02", label = "PID", marker = "o")
 
     plt.xticks(targets)
-    plt.xlabel("Force Target (N)")
-    plt.ylabel("Average Error (%)")
+    plt.xlabel("Force Target (N)", size = 18)
+    plt.ylabel("Average Error (%)", size = 18)
     plt.grid(True)
     
-    plt.legend()
+    plt.legend(fontsize = 18)
     plt.show()
     
 
@@ -94,11 +94,11 @@ def PHPID_PID_comp(folderpath):
     plt.plot(targets, phase3_errs[2], color="#7570b3", label = "PID(Lo)", marker = "o")
 
     plt.xticks(targets)
-    plt.xlabel("Force Target (N)")
-    plt.ylabel("Average Error (N)")
+    plt.xlabel("Force Target (N)", size = 18)
+    plt.ylabel("Average Error (N)", size = 18)
     plt.grid(True)
     
-    plt.legend()
+    plt.legend(fontsize = 18)
     plt.show()
 
     #PERCENTAGE ERROR
@@ -108,11 +108,11 @@ def PHPID_PID_comp(folderpath):
     plt.plot(targets, phase3_percentage_errs[2], color="#7570b3", label = "PID(Lo)", marker = "o")
 
     plt.xticks(targets)
-    plt.xlabel("Force Target (N)")
-    plt.ylabel("Average Error (%)")
+    plt.xlabel("Force Target (N)", size = 18)
+    plt.ylabel("Average Error (%)", size = 18)
     plt.grid(True)
     
-    plt.legend()
+    plt.legend(fontsize = 18)
     plt.show()
 
 
@@ -221,13 +221,13 @@ Creates box plots based on the phase2 and phase 3 error for each of the PHPID an
 Useful when combined with the average area to look at the spread of errors
 allows for a more quantative analysis (that considers the whole signal)
 """
-def PHPID_PID_box_comp(folderpath):
+def PHPID_PID_box_comp_all(folderpath):
 
     prefixes = ["PHPID", "PID1", "PID2"]
 
     errs = {"PHPID":[],"PID1":[],"PID2":[]}
 
-    targets = [-5, -10, -25, -50, -100, -200, -300, -400]
+    targets = [5, 10, 25, 50, 100, 200, 300, 400]
 
     #Go through every prefix and get the error for the phases of each run
     for prefix in prefixes:      
@@ -257,10 +257,8 @@ def PHPID_PID_box_comp(folderpath):
             col_cnt = col_cnt + 1
             axs[row_cnt,col_cnt].boxplot(errs[prefix][col_cnt][targ], showfliers=False)
 
-            
 
 
-    
         #Setup the figure
         fig.suptitle(f"Phase error comparison - target = -{targ}")
 
@@ -278,6 +276,52 @@ def PHPID_PID_box_comp(folderpath):
     
 
     return
+
+
+#Plot the boxplots of the combined force errors (i.e. zip all target 5N together then plot as a box next to 10/25 etc...)
+def PHPID_PID_box_comp_targets(folderpath):
+
+    prefixes = ["PHPID", "PID1", "PID2"]
+
+    errs = {"PHPID":[],"PID1":[],"PID2":[]}
+
+    targets = [5, 10, 25, 50, 100, 200, 300, 400]
+
+    #Go through every prefix and get the error for the phases of each run
+    for prefix in prefixes:      
+        errs[prefix] = get_phase_errs(folderpath, prefix)
+
+
+        #Phase 2 - index 0
+        
+        #Flatten each of the error signals into one giant list to asses the whole thing
+        phase2_errs_flattened = list(list((x for xs in errs[prefix][0][key] for x in xs)) for key in targets)
+
+        fig, ax = plt.subplots()
+        plt.boxplot(phase2_errs_flattened, showfliers=False)
+        ax.set_xlabel("Force Target (N)", size = 16)
+        ax.set_ylabel("Force (N)", size = 16)
+        ax.set_xticklabels(targets)
+        plt.ylim([-17, 17])
+        plt.show()
+
+        #Phase 3 - index 1 
+
+        phase3_errs_flattened = list(list((x for xs in errs[prefix][1][key] for x in xs)) for key in targets)
+
+        fig, ax = plt.subplots()
+        plt.boxplot(phase3_errs_flattened, showfliers=False)
+        ax.set_xlabel("Force Target (N)", size = 16)
+        ax.set_ylabel("Force (N)", size = 16)
+        ax.set_xticklabels(targets)
+        plt.ylim([-55, 55])
+        plt.show()
+
+
+
+    return
+
+
 #Get all the data from each test
 def get_data(filepath):
         
@@ -364,6 +408,6 @@ if __name__ == "__main__":
 
     folderpath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\"
 
-    PHPID_PID_comp(folderpath)
+    #PHPID_PID_comp(folderpath)
 
-    #PHPID_PID_box_comp(folderpath)
+    PHPID_PID_box_comp_targets(folderpath)
