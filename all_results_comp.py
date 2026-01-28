@@ -12,6 +12,107 @@ import matplotlib.pyplot as plt
 
 
 """
+Results pre-taken from the results excel sheet
+Compares the force error averages for the different speeds tested
+"""
+def speed_mod_comparison(folderpath):
+
+    #Target for all of the speed 
+    FORCE_TARGET = -200    
+
+    #Speeds (in mm/s)
+    speeds =[0.25, 0.5, 1, 2, 5, 10, 25] 
+
+    vert_force_errs = {}
+    lateral_forces = {}
+
+    #Go through every file
+    for file in listdir(folderpath):
+        data = get_data((folderpath+file+"/data_"+file+".txt"))
+
+        #We only care about phase 3 data
+        phase3_marker = data["phase 3 marker"]
+      
+        #Extract the forces
+        phase3_x_forces = list(x[0] for x in data["forces"][phase3_marker:])
+        phase3_y_forces = list(x[1] for x in data["forces"][phase3_marker:])
+        phase3_z_errs = concatenate(list(x for x in data["force error"][phase3_marker:]))
+        
+
+        #Get the speed from the title
+        splt_title = file.split("_")[0]
+        splt_title=int(splt_title.split("-")[1]) / 100
+            
+        
+        #Sort the forces into the dictionary
+        if splt_title in vert_force_errs.keys():
+            vert_force_errs[splt_title].append(phase3_z_errs)            
+            lateral_forces[splt_title].append([phase3_x_forces, phase3_y_forces])
+        else:
+            vert_force_errs[splt_title] = [phase3_z_errs]
+            lateral_forces[splt_title] = [phase3_x_forces, phase3_y_forces]
+
+
+            
+    #Force Averages
+    avg_vert_errs = []
+    avg_lat_force = []
+
+    #Go through each key and calculate the force averages
+    for key in speeds:
+
+        #WRONG
+        #Flatten all the error signals from each run into one
+        #errs_flattened =list((x for xs in vert_force_errs[key] for x in xs))
+        
+        #Calculate the average error for each run
+        errs = list(mean(x) for x in vert_force_errs[key])
+    
+        #Calculate the average of the average errors and append
+        avg_vert_errs.append(mean(errs)) 
+
+        #Calculate the absolute lateral force being applied 
+        x_forces = list(abs(x) for x in lateral_forces[key][0])
+        y_forces = list(abs(y) for y in lateral_forces[key][1])
+
+        #Calculate the average of the average lateral forces and append
+        avg_lat_force.append((mean(x_forces) + mean(y_forces))/2)
+
+
+    fig, ax = plt.subplots()
+    ax.plot(speeds, avg_vert_errs, color="#1b9e77", label = "Fz", marker = "o")
+    ax.set_xlabel("End-effector speed (mm/s)", size = 18)
+    ax.set_ylabel("Mean force error (N)", size = 18)
+    
+
+    #ax2 = ax.twinx()
+    #ax2.set_ylabel("Mean lateral force (N)")
+    #ax2.plot(speeds, avg_lat_force, color="#d95f02", label = "FLat", marker = "o")    
+    ax.set_xscale("log")
+
+    plt.grid(True)
+    fig.legend(fontsize = 18)
+    plt.show()
+
+
+    #BOXPLOT ------------------
+    errs_flattened = list(list((x for xs in vert_force_errs[key] for x in xs)) for key in speeds)
+
+    fig, ax = plt.subplots()
+    plt.boxplot(errs_flattened, showfliers=False)
+    ax.set_xlabel("Speed (mm/s)", size = 16)
+    ax.set_ylabel("Force error (N)", size = 16)
+    ax.set_xticklabels(speeds)
+    #plt.ylim([-17, 17])
+    plt.show()
+
+
+    return
+
+
+
+
+"""
 Main is currently setup for comparing PHPID and PID erros for the geotechnical 3 phase testing
 """
 def PHPID_PID_comp(folderpath):
@@ -410,4 +511,5 @@ if __name__ == "__main__":
 
     #PHPID_PID_comp(folderpath)
 
-    PHPID_PID_box_comp_targets(folderpath)
+    #PHPID_PID_box_comp_targets(folderpath)
+    speed_mod_comparison(folderpath)

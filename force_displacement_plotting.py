@@ -14,6 +14,11 @@ from tools import *
 from math import sqrt
 from statistics import fmean
 import matplotlib.patches as mpatches
+from config import ConfigHandler
+
+#Config file from the test
+config_data = FileNotFoundError
+
 
 
 phase2_marker = -1
@@ -27,6 +32,7 @@ def main(filepath, rust_check):
     ori = []
     forces = []
     force_error = []
+    embed_height = []
 
     line_cnt = 0
     phase2_marker = -1
@@ -38,7 +44,7 @@ def main(filepath, rust_check):
             #Ensure line isnt empty
             if line and not(line.startswith("!")):
                 #Split the line up
-                tokens = data_split(line, rust_check)               
+                tokens = data_split(line, rust_check)     
                
                 
                 
@@ -55,6 +61,10 @@ def main(filepath, rust_check):
 
                 if rust_check:
                     force_error.append(tokens[4])
+
+                    
+
+
             elif line.startswith(("!")) and "PHASE 2 STARTED" in line:
                 phase2_marker = line_cnt
             elif line.startswith(("!")) and "PHASE 3 STARTED" in line:
@@ -73,6 +83,10 @@ def main(filepath, rust_check):
 
     #Turn the positions into numbers
     pos = str_to_array(pos)
+
+    for item in pos:
+      
+        embed_height.append(config_data.min_embed_height - item[2])
 
     #Turn the forces into numbers
     force = str_to_array(forces)
@@ -108,28 +122,29 @@ def main(filepath, rust_check):
 
     print(f"Settling time: {max(time)}")
 
-    plot_force_history(force, time)
+    #plot_force_history(force, time)
     #highlight_three_phase(force, time, phase2_marker, phase3_marker)
     #plot_pos(pos, time, False)
     plot_height(pos, time)
+    plot_embed_height(embed_height, time)
     #plot_force_vectors(pos[start:stop], force[start:stop], False)
     #plot_work_step(pos, force, time)
-    plot_work_over_time(pos, force, time)
+    #plot_work_over_time(pos, force, time)
     #plot_z_velocity(vels[2], time)
     
 
     #Ensure that the phase markers have been found before trying to isolate the force-phase data
     #Plot up to phase 2 (i.e. plot phase 1)
-    if phase2_marker > 0 and False:
-        plot_force_error(force_error[:phase2_marker], time[:phase2_marker])
+    if phase2_marker > 0 and True:
+        plot_force_history(force[:phase2_marker], time[:phase2_marker])
     #Plot phase 2 to phase 3 marker
-    if phase2_marker > 0 and phase3_marker > 0:
+    if phase2_marker > 0 and phase3_marker > 0 and False:
         plot_force_error(force_error[phase2_marker:phase3_marker-1], time[phase2_marker:phase3_marker-1])
     #No phase 3 marker so just plot post-phase 2 
-    elif phase2_marker > 0:
+    elif phase2_marker > 0 and False:
         plot_force_error(force_error[phase2_marker:], time[phase2_marker:])
         #Plot post phase 3 marker
-    if phase3_marker > 0:
+    if phase3_marker > 0 and False:
         plot_force_error(force_error[phase3_marker:], time[phase3_marker:])
 
     return
@@ -210,10 +225,29 @@ def plot_pos(pos, time, include_z):
 
     if not include_z:
 
+        """
         plt.plot(x[10:], y[10:])
 
         plt.xlabel("x (mm)", fontsize=24)
         plt.ylabel("y (mm)", fontsize=24)
+        plt.tick_params(axis="both", which="major", labelsize=24)
+        plt.grid(True)
+
+        plt.show()
+        """
+
+        plt.plot(time[10:], x[10:])
+
+        plt.xlabel("time (s)", fontsize=24)
+        plt.ylabel("x (mm)", fontsize=24)
+        plt.tick_params(axis="both", which="major", labelsize=24)
+        plt.grid(True)
+        plt.show()
+
+
+        plt.plot(time[10:], y[10:])
+        plt.xlabel("time (s)", fontsize=24)
+        plt.ylabel("x (mm)", fontsize=24)
         plt.tick_params(axis="both", which="major", labelsize=24)
         plt.grid(True)
 
@@ -468,13 +502,27 @@ def highlight_three_phase(force, time, phase2_marker, phase3_marker):
     plt.show()
 
 
+
+def plot_embed_height(embed_dat, time):
+
+        plt.plot(time[10:], embed_dat[10:])
+
+        plt.xlabel("time (s)", fontsize=24)
+        plt.ylabel("embed height (mm)", fontsize=24)
+        plt.tick_params(axis="both", which="major", labelsize=24)
+        plt.grid(True)
+        plt.show()
+
+
 if __name__ == "__main__":
     print("FORCE DISPLACEMENT PLOTTING ------------------")
 
-    test_name = "no_phase2-200_2"
-    #test_name = "speed-500_5"
+    #test_name = "geo_phase2-500_2"
+    test_name = "LONG_speed-10_1"
     CAPTURED_USING_RUST = True
 
-    filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
+    conf_filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\conf_" + test_name + ".txt"
+    config_data = ConfigHandler(conf_filepath)
+    data_filepath = "C:\\Users\\User\\Documents\\Results\\DEPTH_TESTS\\" + test_name + "\\data_" + test_name + ".txt"
 
-    main(filepath, CAPTURED_USING_RUST)
+    main(data_filepath, CAPTURED_USING_RUST)
